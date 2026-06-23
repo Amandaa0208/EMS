@@ -66,13 +66,22 @@ def init_db():
 init_db()
 
 # Load and shift building telemetry data from sqlite database
-def get_building_data(building_num):
+def get_building_data(building_num_or_port):
     db_path = "ems.db"
     if not os.path.exists(db_path):
         return pd.DataFrame()
     
     conn = sqlite3.connect(db_path)
-    table_name = f"device{building_num}_readings"
+    val_str = str(building_num_or_port)
+    if val_str == "1" or val_str == "502":
+        table_name = "device1_readings"
+    elif val_str == "2" or val_str == "503":
+        table_name = "device2_readings"
+    elif val_str == "3" or val_str == "504":
+        table_name = "device3_readings"
+    else:
+        table_name = f"device_port_{val_str}_readings"
+        
     try:
         df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
     except Exception as e:
@@ -82,6 +91,21 @@ def get_building_data(building_num):
     if df.empty:
         return df
         
+    # Standardize columns from new format to old format if necessary
+    rename_map = {
+        'id_log': 'id',
+        'kwh_energy': 'energy_kwh',
+        'kw_power_total': 'power_total_kw',
+        'frequency': 'frequency_hz',
+        'voltage_a': 'voltage_r',
+        'voltage_b': 'voltage_s',
+        'voltage_c': 'voltage_t',
+        'current_a': 'current_r',
+        'current_b': 'current_s',
+        'current_c': 'current_t'
+    }
+    df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+        
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     # Clean power load (kW) to absolute values representing magnitude
     if 'power_total_kw' in df.columns:
@@ -89,8 +113,9 @@ def get_building_data(building_num):
         
     # Shift timestamps so that the latest reading matches current local time
     max_ts = df['timestamp'].max()
-    delta = datetime.now() - max_ts
-    df['timestamp'] = df['timestamp'] + delta
+    if pd.notna(max_ts):
+        delta = datetime.now() - max_ts
+        df['timestamp'] = df['timestamp'] + delta
     
     return df
 
@@ -111,6 +136,12 @@ if "batas_angka" not in st.session_state:
     st.session_state["batas_angka"] = 1700
 if "categories" not in st.session_state:
     st.session_state["categories"] = ["AC", "Lighting", "Equipment"]
+if "gedung_list" not in st.session_state:
+    st.session_state["gedung_list"] = [
+        {"nama": "Gedung 1", "port": "502"},
+        {"nama": "Gedung 2", "port": "503"},
+        {"nama": "Gedung 3", "port": "504"}
+    ]
 
 if not st.session_state["logged_in"]:
     st.markdown(
@@ -381,6 +412,98 @@ st.markdown(
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
+
+        /* Main area inputs, labels, and selectbox visibility fixes */
+        section[data-testid="stMain"] label,
+        section[data-testid="stMain"] label p,
+        section[data-testid="stMain"] [data-testid="stWidgetLabel"] p {
+            color: #0b1c30 !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+        }
+
+        /* TextInput & NumberInput styling inside Main container */
+        section[data-testid="stMain"] div[data-testid="stTextInput"] input,
+        section[data-testid="stMain"] div[data-testid="stNumberInput"] input {
+            background-color: #ffffff !important;
+            color: #0b1c30 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            padding: 8px 12px !important;
+            font-size: 14px !important;
+        }
+
+        section[data-testid="stMain"] div[data-testid="stTextInput"] input:focus,
+        section[data-testid="stMain"] div[data-testid="stNumberInput"] input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Selectbox styling */
+        section[data-testid="stMain"] div[data-testid="stSelectbox"] div[data-baseweb="select"] {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+        }
+        
+        section[data-testid="stMain"] div[data-testid="stSelectbox"] div[data-baseweb="select"] * {
+            color: #0b1c30 !important;
+        }
+
+        /* Dropdown list styling */
+        div[data-baseweb="popover"] ul[role="listbox"] {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+        
+        div[data-baseweb="popover"] ul[role="listbox"] li {
+            color: #0b1c30 !important;
+        }
+
+        /* Main Area Button Styling */
+        section[data-testid="stMain"] button {
+            background-color: #ffffff !important;
+            color: #0b1c30 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            padding: 8px 16px !important;
+            transition: all 0.2s ease !important;
+        }
+
+        section[data-testid="stMain"] button:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+
+        /* Primary Button Styling */
+        section[data-testid="stMain"] button[kind="primary"] {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+            border: 1px solid #3b82f6 !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        }
+
+        section[data-testid="stMain"] button[kind="primary"]:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        /* Delete button container explicit red styling */
+        div[data-testid="element-container"]:has(.delete-btn-marker) ~ div[data-testid="element-container"] button {
+            background-color: #fee2e2 !important;
+            color: #ef4444 !important;
+            border: 1px solid #fca5a5 !important;
+        }
+
+        div[data-testid="element-container"]:has(.delete-btn-marker) ~ div[data-testid="element-container"] button:hover {
+            background-color: #fecaca !important;
+            color: #dc2626 !important;
+            border-color: #f87171 !important;
+        }
     </style>
     """,
     unsafe_allow_html=True
@@ -514,33 +637,28 @@ def build_header(title, subtitle_badge=None, temp_str="31°C", user_role=None, u
 if page == "Dashboard":
     build_header("Dashboard EMS", temp_str="31°C")
     
-    # Load data from database
-    df1 = get_building_data(1)
-    df2 = get_building_data(2)
-    df3 = get_building_data(3)
+    # Load data from database dynamically
+    total_kwh_today = 0
+    avg_power = 0
+    building_dfs = {}
     
-    # Calculate today's kWh consumption from database (latest 24 hours delta)
     now = datetime.now()
     one_day_ago = now - timedelta(days=1)
     
-    kwh1_today = 0
-    kwh2_today = 0
-    kwh3_today = 0
-    
-    if not df1.empty:
-        df1_today = df1[df1['timestamp'] >= one_day_ago]
-        if len(df1_today) >= 2:
-            kwh1_today = df1_today['energy_kwh'].max() - df1_today['energy_kwh'].min()
-    if not df2.empty:
-        df2_today = df2[df2['timestamp'] >= one_day_ago]
-        if len(df2_today) >= 2:
-            kwh2_today = df2_today['energy_kwh'].max() - df2_today['energy_kwh'].min()
-    if not df3.empty:
-        df3_today = df3[df3['timestamp'] >= one_day_ago]
-        if len(df3_today) >= 2:
-            kwh3_today = df3_today['energy_kwh'].max() - df3_today['energy_kwh'].min()
+    for g in st.session_state['gedung_list']:
+        g_name = g['nama']
+        g_port = g['port']
+        df_g = get_building_data(g_port)
+        building_dfs[g_port] = df_g
+        
+        if not df_g.empty:
+            df_g_today = df_g[df_g['timestamp'] >= one_day_ago]
+            if len(df_g_today) >= 2:
+                kwh_today = df_g_today['energy_kwh'].max() - df_g_today['energy_kwh'].min()
+                total_kwh_today += kwh_today
             
-    total_kwh_today = kwh1_today + kwh2_today + kwh3_today
+            avg_power += df_g['power_total_kw'].mean()
+            
     if total_kwh_today <= 0:
         total_kwh_today = 1248.50 # Fallback
         
@@ -548,14 +666,6 @@ if page == "Dashboard":
     
     # Scale consumption magnitude based on average actual load in database
     kw_scale = 1.0
-    avg_power = 0
-    if not df1.empty:
-        avg_power += df1['power_total_kw'].mean()
-    if not df2.empty:
-        avg_power += df2['power_total_kw'].mean()
-    if not df3.empty:
-        avg_power += df3['power_total_kw'].mean()
-        
     if avg_power > 0:
         # Scale matching default 75kW average load shape
         kw_scale = avg_power / 75.0
@@ -794,27 +904,18 @@ if page == "Dashboard":
     with search_col:
         search_query = st.text_input("Search Gedung...", placeholder="Cari Gedung atau Port...", label_visibility="collapsed")
         
-    transactions_data = []
-    # Fetch latest rows for display
-    df1_lat = df1.tail(5).copy() if not df1.empty else pd.DataFrame()
-    df2_lat = df2.tail(5).copy() if not df2.empty else pd.DataFrame()
-    df3_lat = df3.tail(5).copy() if not df3.empty else pd.DataFrame()
-    
-    if not df1_lat.empty:
-        df1_lat['Gedung'] = 'Gedung 1'
-        df1_lat['Port'] = 502
-    if not df2_lat.empty:
-        df2_lat['Gedung'] = 'Gedung 2'
-        df2_lat['Port'] = 503
-    if not df3_lat.empty:
-        df3_lat['Gedung'] = 'Gedung 3'
-        df3_lat['Port'] = 504
-        
     combined_list = []
-    for df_lat in [df1_lat, df2_lat, df3_lat]:
-        if not df_lat.empty:
+    for g in st.session_state['gedung_list']:
+        g_name = g['nama']
+        g_port = g['port']
+        df_g = building_dfs.get(g_port, pd.DataFrame())
+        if not df_g.empty:
+            df_lat = df_g.tail(5).copy()
+            df_lat['Gedung'] = g_name
+            df_lat['Port'] = g_port
             combined_list.append(df_lat)
             
+    transactions_data = []
     if combined_list:
         df_combined = pd.concat(combined_list).sort_values(by='timestamp', ascending=False)
         for _, row in df_combined.iterrows():
@@ -824,7 +925,7 @@ if page == "Dashboard":
             
             transactions_data.append({
                 "Gedung": row['Gedung'],
-                "Port": f"502" if row['Port'] == 502 else (f"503" if row['Port'] == 503 else "504"),
+                "Port": str(row['Port']),
                 "Waktu": row['timestamp'].strftime("%Y-%m-%d %H:%M:%S"),
                 "KWH": f"{kwh_val:,.2f} kWh",
                 "KW": f"{kw_val:,.4f} kW",
@@ -833,11 +934,19 @@ if page == "Dashboard":
             })
     else:
         # Dummy fallback if database not available
-        transactions_data = [
-            {"Gedung": "Gedung 3", "Port": "504", "Waktu": "Today, 17:00", "KWH": "370.43 kWh", "KW": "0.3671 kW", "Freq": "50.01 Hz", "Biaya": f"Rp {370.43 * st.session_state['tarif_pln']:,.0f}"},
-            {"Gedung": "Gedung 2", "Port": "503", "Waktu": "Today, 16:59", "KWH": "229.57 kWh", "KW": "1.3484 kW", "Freq": "50.01 Hz", "Biaya": f"Rp {229.57 * st.session_state['tarif_pln']:,.0f}"},
-            {"Gedung": "Gedung 1", "Port": "502", "Waktu": "Today, 16:58", "KWH": "9,079.13 kWh", "KW": "0.0781 kW", "Freq": "49.97 Hz", "Biaya": f"Rp {9079.13 * st.session_state['tarif_pln']:,.0f}"},
-        ]
+        transactions_data = []
+        for idx, g in enumerate(st.session_state['gedung_list']):
+            mock_kwh = 9000.0 / (idx + 1)
+            mock_kw = 0.5 + 0.4 * idx
+            transactions_data.append({
+                "Gedung": g["nama"],
+                "Port": g["port"],
+                "Waktu": "Today, 17:00",
+                "KWH": f"{mock_kwh:,.2f} kWh",
+                "KW": f"{mock_kw:,.4f} kW",
+                "Freq": "50.00 Hz",
+                "Biaya": f"Rp {mock_kwh * st.session_state['tarif_pln']:,.0f}"
+            })
 
     filtered_tx = [
         tx for tx in transactions_data 
@@ -1130,23 +1239,27 @@ elif page == "Analisa Energi":
 elif page == "Profile Gedung":
     build_header("Profil Energi & Telemetri Gedung", temp_str="31°C")
     
-    # Selection of Building
-    selected_gedung = st.selectbox("Pilih Gedung untuk Monitoring:", ["Gedung 1 (Port 502)", "Gedung 2 (Port 503)", "Gedung 3 (Port 504)"])
+    # Selection of Building dynamically from session_state
+    options = [f"{g['nama']} (Port {g['port']})" for g in st.session_state['gedung_list']]
+    selected_gedung = st.selectbox("Pilih Gedung untuk Monitoring:", options)
     
-    if "Gedung 1" in selected_gedung:
-        building_num = 1
-        port = 502
-    elif "Gedung 2" in selected_gedung:
-        building_num = 2
-        port = 503
+    selected_g_dict = None
+    for g in st.session_state['gedung_list']:
+        if f"{g['nama']} (Port {g['port']})" == selected_gedung:
+            selected_g_dict = g
+            break
+            
+    if selected_g_dict:
+        g_name = selected_g_dict['nama']
+        port = selected_g_dict['port']
+        df = get_building_data(port)
     else:
-        building_num = 3
-        port = 504
-        
-    df = get_building_data(building_num)
+        g_name = "Tidak Ada"
+        port = ""
+        df = pd.DataFrame()
     
     if df.empty:
-        st.warning(f"Data untuk Gedung {building_num} tidak ditemukan di database ems.db.")
+        st.warning(f"Data untuk {g_name} tidak ditemukan di database ems.db.")
     else:
         # Get latest reading
         latest_row = df.iloc[-1]
@@ -1378,7 +1491,7 @@ elif page == "Profile Gedung":
                 </table>
             </div>
             <div style="padding: 12px 16px; background-color: #ffffff; border-top: 1px solid #e2e8f0; text-align: right;">
-                <span style="font-size: 11px; color: #76777d; font-weight: bold;">Showing 15 latest readings from table device{building_num}_readings</span>
+                <span style="font-size: 11px; color: #76777d; font-weight: bold;">Showing 15 latest readings from table {("device1_readings" if str(port) == "502" else ("device2_readings" if str(port) == "503" else ("device3_readings" if str(port) == "504" else f"device_port_{port}_readings")))}</span>
             </div>
         </div>
         """
@@ -1442,17 +1555,28 @@ elif page == "Forecasting":
     # Selection controls
     fcol1, fcol2 = st.columns(2)
     with fcol1:
-        f_gedung = st.selectbox("Pilih Gedung untuk Prediksi:", ["Gedung 1 (Port 502)", "Gedung 2 (Port 503)", "Gedung 3 (Port 504)"])
+        f_options = [f"{g['nama']} (Port {g['port']})" for g in st.session_state['gedung_list']]
+        f_gedung = st.selectbox("Pilih Gedung untuk Prediksi:", f_options)
     with fcol2:
         f_horizon = st.selectbox("Rentang Waktu Prediksi:", ["1 Hari ke Depan (24 Jam)", "7 Hari ke Depan (168 Jam)"])
         
-    building_num = 1 if "Gedung 1" in f_gedung else (2 if "Gedung 2" in f_gedung else 3)
+    selected_g_dict = None
+    for g in st.session_state['gedung_list']:
+        if f"{g['nama']} (Port {g['port']})" == f_gedung:
+            selected_g_dict = g
+            break
+            
     horizon_hours = 24 if "1 Hari" in f_horizon else 168
     
-    df = get_building_data(building_num)
+    if selected_g_dict:
+        g_name = selected_g_dict['nama']
+        df = get_building_data(selected_g_dict['port'])
+    else:
+        g_name = "Tidak Ada"
+        df = pd.DataFrame()
     
     if df.empty:
-        st.warning(f"Data untuk Gedung {building_num} tidak ditemukan di database.")
+        st.warning(f"Data untuk {g_name} tidak ditemukan di database.")
     else:
         with st.spinner("Melatih Model Machine Learning (Random Forest Regressor)..."):
             future_dates, predictions, r2, rmse = train_forecast_model(df, horizon_hours)
@@ -1574,11 +1698,17 @@ elif page == "Reports & Audit":
                     {"Bulan": "Mei 2024", "Target Efisiensi (kWh)": 25000, "Realisasi (kWh)": 24150, "Status": "Target Tercapai"}
                 ]
             else:
-                mock_data = [
-                    {"Tanggal": "2026-06-16", "Nama Gedung": "Gedung 1", "Daya (kWh)": 1205.5, "Total Biaya (Rp)": int(1205.5 * st.session_state["tarif_pln"])},
-                    {"Tanggal": "2026-06-16", "Nama Gedung": "Gedung 2", "Daya (kWh)": 980.2, "Total Biaya (Rp)": int(980.2 * st.session_state["tarif_pln"])},
-                    {"Tanggal": "2026-06-16", "Nama Gedung": "Gedung 3", "Daya (kWh)": 1430.7, "Total Biaya (Rp)": int(1430.7 * st.session_state["tarif_pln"])}
-                ]
+                mock_data = []
+                import random
+                random.seed(42)
+                for g in st.session_state['gedung_list']:
+                    daya = round(random.uniform(800.0, 1500.0), 1)
+                    mock_data.append({
+                        "Tanggal": "2026-06-16",
+                        "Nama Gedung": g["nama"],
+                        "Daya (kWh)": daya,
+                        "Total Biaya (Rp)": int(daya * st.session_state["tarif_pln"])
+                    })
             df_report = pd.DataFrame(mock_data)
             csv_report = df_report.to_csv(index=False).encode('utf-8')
             
@@ -1655,13 +1785,26 @@ elif page == "Reports & Audit":
         with tcol2:
             search_audit = st.text_input("Cari ID Bukti / Tanggal...", label_visibility="collapsed", placeholder="Cari ID Bukti / Tanggal...")
             
-        audit_logs = [
-            {"tanggal": "28 Mei 2024, 08:30", "tipe": "Konsumsi Harian", "badge_class": "bg-surface-variant text-on-surface-variant", "deskripsi": "Gedung 1 - Port 502", "daya": "450.2", "rupiah": f"Rp {450.2 * st.session_state['tarif_pln']:,.0f}", "rupiah_class": "text-error", "status": "Tercatat", "dot_class": "bg-on-tertiary-container"},
-            {"tanggal": "28 Mei 2024, 09:15", "tipe": "Konsumsi Harian", "badge_class": "bg-secondary-fixed text-on-secondary-fixed-variant", "deskripsi": "Gedung 2 - Port 503", "daya": "320.5", "rupiah": f"Rp {320.5 * st.session_state['tarif_pln']:,.0f}", "rupiah_class": "text-error", "status": "Tercatat", "dot_class": "bg-secondary"},
-            {"tanggal": "27 Mei 2024, 14:20", "tipe": "Konsumsi Harian", "badge_class": "bg-secondary-fixed text-on-secondary-fixed-variant", "deskripsi": "Gedung 3 - Port 504", "daya": "610.8", "rupiah": f"Rp {610.8 * st.session_state['tarif_pln']:,.0f}", "rupiah_class": "text-error", "status": "Tercatat", "dot_class": "bg-secondary"},
-            {"tanggal": "27 Mei 2024, 18:00", "tipe": "Konsumsi Harian", "badge_class": "bg-surface-variant text-on-surface-variant", "deskripsi": "Gedung 1 - Port 502", "daya": "120.8", "rupiah": f"Rp {120.8 * st.session_state['tarif_pln']:,.0f}", "rupiah_class": "text-error", "status": "Tercatat", "dot_class": "bg-on-tertiary-container"},
-            {"tanggal": "27 Mei 2024, 20:10", "tipe": "Konsumsi Harian", "badge_class": "bg-secondary-fixed text-on-secondary-fixed-variant", "deskripsi": "Gedung 2 - Port 503", "daya": "218.4", "rupiah": f"Rp {218.4 * st.session_state['tarif_pln']:,.0f}", "rupiah_class": "text-error", "status": "Tercatat", "dot_class": "bg-secondary"}
-        ]
+        audit_logs = []
+        import random
+        random.seed(123)
+        dates_logs = ["28 Mei 2024, 08:30", "28 Mei 2024, 09:15", "27 Mei 2024, 14:20", "27 Mei 2024, 18:00", "27 Mei 2024, 20:10"]
+        for i, date_str in enumerate(dates_logs):
+            if not st.session_state['gedung_list']:
+                break
+            g = st.session_state['gedung_list'][i % len(st.session_state['gedung_list'])]
+            daya = round(random.uniform(100.0, 700.0), 1)
+            audit_logs.append({
+                "tanggal": date_str,
+                "tipe": "Konsumsi Harian",
+                "badge_class": "bg-surface-variant text-on-surface-variant",
+                "deskripsi": f"{g['nama']} - Port {g['port']}",
+                "daya": str(daya),
+                "rupiah": f"Rp {daya * st.session_state['tarif_pln']:,.0f}",
+                "rupiah_class": "text-error",
+                "status": "Tercatat",
+                "dot_class": "bg-on-tertiary-container"
+            })
         
         filtered_logs = [log for log in audit_logs if search_audit.lower() in log["deskripsi"].lower() or search_audit.lower() in log["tanggal"].lower() or search_audit.lower() in log["tipe"].lower()]
         
@@ -1747,21 +1890,18 @@ elif page == "Admin Settings":
             st.markdown("### 2. Status Koneksi Gateway Modbus")
             st.markdown("<p style='font-size: 13px; color: #76777d;'>Status koneksi real-time ke masing-masing port gateway Modbus gedung.</p>", unsafe_allow_html=True)
             
-            st.markdown(
+            status_items = ""
+            for g in st.session_state["gedung_list"]:
+                status_items += f"""
+                <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: #f8f9ff; border: 1px solid #c6c6cd; border-radius: 8px; font-size: 13px;">
+                    <span style="font-weight: 600; color: #0b1c30;">{g['nama']} (Port {g['port']})</span>
+                    <span style="color: #009668; font-weight: 700;">● Terhubung (Online)</span>
+                </div>
                 """
+            st.markdown(
+                f"""
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: #f8f9ff; border: 1px solid #c6c6cd; border-radius: 8px; font-size: 13px;">
-                        <span style="font-weight: 600; color: #0b1c30;">Gedung 1 (Port 502)</span>
-                        <span style="color: #009668; font-weight: 700;">● Terhubung (Online)</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: #f8f9ff; border: 1px solid #c6c6cd; border-radius: 8px; font-size: 13px;">
-                        <span style="font-weight: 600; color: #0b1c30;">Gedung 2 (Port 503)</span>
-                        <span style="color: #009668; font-weight: 700;">● Terhubung (Online)</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: #f8f9ff; border: 1px solid #c6c6cd; border-radius: 8px; font-size: 13px;">
-                        <span style="font-weight: 600; color: #0b1c30;">Gedung 3 (Port 504)</span>
-                        <span style="color: #009668; font-weight: 700;">● Terhubung (Online)</span>
-                    </div>
+                    {status_items}
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -1799,6 +1939,7 @@ elif page == "Admin Settings":
                     """,
                     unsafe_allow_html=True
                 )
+                st.markdown('<span class="delete-btn-marker" style="display:none;">marker</span>', unsafe_allow_html=True)
                 if st.button(f"Hapus {cat}", key=f"del_{cat}_{idx}", use_container_width=True):
                     st.session_state["categories"].remove(cat)
                     st.rerun()
@@ -1813,3 +1954,97 @@ elif page == "Admin Settings":
                     st.session_state["categories"].append(new_cat_name)
                     st.success(f"Kategori '{new_cat_name}' ditambahkan!")
                     st.rerun()
+                    
+    # 5. Manajemen Gedung Section
+    with st.container(border=True):
+        st.markdown("### 5. Manajemen Gedung")
+        st.markdown("<p style='font-size: 13px; color: #76777d;'>Kelola daftar gedung yang terdaftar dalam Energy Management System dan konfigurasi port gateway Modbus.</p>", unsafe_allow_html=True)
+        
+        # Display existing buildings
+        st.markdown("<h4 style='font-size: 14px; font-weight: 700; color: #0b1c30; margin-top: 15px;'>Daftar Gedung Terdaftar</h4>", unsafe_allow_html=True)
+        
+        if st.session_state["gedung_list"]:
+            gedung_cols = st.columns(4)
+            for idx, g in enumerate(st.session_state["gedung_list"]):
+                col_idx = idx % 4
+                with gedung_cols[col_idx]:
+                    st.markdown(
+                        f"""
+                        <div style="padding: 14px; background-color: #f8f9ff; border: 1px solid #c6c6cd; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px;">
+                            <div>
+                                <span style="font-weight: 700; color: #0b1c30; font-size: 14px; display: block; margin-bottom: 4px;">{g['nama']}</span>
+                                <span style="font-size: 11px; color: #76777d; font-weight: 600; display: block;">Modbus Port: <b style="color: #0058be;">{g['port']}</b></span>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    st.markdown('<span class="delete-btn-marker" style="display:none;">marker</span>', unsafe_allow_html=True)
+                    if st.button(f"Hapus {g['nama']}", key=f"del_g_{g['port']}_{idx}", use_container_width=True):
+                        st.session_state["gedung_list"].remove(g)
+                        st.success(f"Gedung '{g['nama']}' berhasil dihapus!")
+                        st.rerun()
+        else:
+            st.info("Belum ada gedung terdaftar.")
+                    
+        st.markdown("<hr style='margin: 20px 0; border-color: #eff4ff;'>", unsafe_allow_html=True)
+        st.markdown("<h4 style='font-size: 14px; font-weight: 700; color: #0b1c30;'>Tambah Gedung Baru</h4>", unsafe_allow_html=True)
+        
+        gcol1, gcol2, gcol3 = st.columns([1.5, 1.5, 1])
+        with gcol1:
+            new_g_nama = st.text_input("Nama Gedung:", placeholder="Contoh: Gedung 4", key="new_g_nama")
+        with gcol2:
+            new_g_port = st.text_input("Nomor Port Modbus (5XX):", placeholder="Contoh: 505", key="new_g_port")
+        with gcol3:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            if st.button("Tambah Gedung", type="primary", use_container_width=True):
+                if not new_g_nama or not new_g_port:
+                    st.error("Nama Gedung dan Port tidak boleh kosong!")
+                elif not new_g_port.isdigit():
+                    st.error("Port Modbus harus berupa angka!")
+                elif any(g['port'] == new_g_port for g in st.session_state['gedung_list']):
+                    st.error(f"Gedung dengan Port {new_g_port} sudah terdaftar!")
+                elif any(g['nama'].lower() == new_g_nama.lower() for g in st.session_state['gedung_list']):
+                    st.error(f"Gedung dengan Nama '{new_g_nama}' sudah terdaftar!")
+                else:
+                    db_path = "ems.db"
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    table_name = f"device_port_{new_g_port}_readings"
+                    
+                    try:
+                        cursor.execute(f"""
+                            CREATE TABLE IF NOT EXISTS {table_name} (
+                                id_log INTEGER PRIMARY KEY AUTOINCREMENT, 
+                                timestamp TEXT, 
+                                kwh_energy REAL, 
+                                kw_power_total REAL, 
+                                frequency REAL, 
+                                voltage_a REAL, 
+                                voltage_b REAL, 
+                                voltage_c REAL,
+                                current_a REAL, 
+                                current_b REAL, 
+                                current_c REAL
+                            )
+                        """)
+                        conn.commit()
+                        
+                        # Add a dummy record so the page doesn't show completely empty data right away
+                        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        cursor.execute(f"""
+                            INSERT INTO {table_name} (
+                                timestamp, kwh_energy, kw_power_total, frequency, 
+                                voltage_a, voltage_b, voltage_c, 
+                                current_a, current_b, current_c
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (now_str, 0.0, 0.0, 50.0, 220.0, 220.0, 220.0, 0.0, 0.0, 0.0))
+                        conn.commit()
+                        
+                        st.session_state["gedung_list"].append({"nama": new_g_nama, "port": new_g_port})
+                        st.success(f"Gedung '{new_g_nama}' dengan Port {new_g_port} berhasil ditambahkan dan tabel {table_name} dibuat!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Gagal membuat tabel database: {str(e)}")
+                    finally:
+                        conn.close()
