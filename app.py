@@ -532,9 +532,10 @@ st.markdown(
             font-size: 13px !important;
         }
 
-        /* TextInput & NumberInput styling inside Main container */
+        /* TextInput, NumberInput, & DateInput styling inside Main container */
         section[data-testid="stMain"] div[data-testid="stTextInput"] input,
-        section[data-testid="stMain"] div[data-testid="stNumberInput"] input {
+        section[data-testid="stMain"] div[data-testid="stNumberInput"] input,
+        section[data-testid="stMain"] div[data-testid="stDateInput"] input {
             background-color: #ffffff !important;
             color: #0b1c30 !important;
             border: 1px solid #cbd5e1 !important;
@@ -544,7 +545,8 @@ st.markdown(
         }
 
         section[data-testid="stMain"] div[data-testid="stTextInput"] input:focus,
-        section[data-testid="stMain"] div[data-testid="stNumberInput"] input:focus {
+        section[data-testid="stMain"] div[data-testid="stNumberInput"] input:focus,
+        section[data-testid="stMain"] div[data-testid="stDateInput"] input:focus {
             border-color: #3b82f6 !important;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
             background-color: #ffffff !important;
@@ -557,11 +559,21 @@ st.markdown(
             border-radius: 6px !important;
         }
         
-        section[data-testid="stMain"] div[data-testid="stSelectbox"] div[data-baseweb="select"] * {
+        section[data-testid="stMain"] div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+            background-color: #ffffff !important;
             color: #0b1c30 !important;
         }
+        
+        section[data-testid="stMain"] div[data-testid="stSelectbox"] div[data-baseweb="select"] * {
+            color: #0b1c30 !important;
+            background-color: transparent !important;
+        }
 
-        /* Dropdown list styling */
+        /* Dropdown list popover styling */
+        div[data-baseweb="popover"] {
+            background-color: #ffffff !important;
+        }
+        
         div[data-baseweb="popover"] ul[role="listbox"] {
             background-color: #ffffff !important;
             border: 1px solid #cbd5e1 !important;
@@ -569,6 +581,30 @@ st.markdown(
         
         div[data-baseweb="popover"] ul[role="listbox"] li {
             color: #0b1c30 !important;
+            background-color: #ffffff !important;
+            transition: background-color 0.15s ease;
+        }
+        
+        div[data-baseweb="popover"] ul[role="listbox"] li:hover,
+        div[data-baseweb="popover"] ul[role="listbox"] li[aria-selected="true"] {
+            background-color: #eff4ff !important;
+            color: #0058be !important;
+        }
+        
+        /* Calendar/DatePicker popup overrides */
+        div[data-baseweb="calendar"] {
+            background-color: #ffffff !important;
+            color: #0b1c30 !important;
+        }
+        
+        div[data-baseweb="calendar"] * {
+            color: #0b1c30 !important;
+            background-color: transparent !important;
+        }
+        
+        div[data-baseweb="calendar"] [role="gridcell"]:hover {
+            background-color: #eff4ff !important;
+            color: #0058be !important;
         }
 
         /* Main Area Button Styling */
