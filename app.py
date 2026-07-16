@@ -419,6 +419,24 @@ st.markdown(
             border-right: 1px solid #c6c6cd !important;
             min-width: 260px !important;
             max-width: 260px !important;
+            z-index: 900 !important;
+        }
+
+        /* Keep Streamlit's sidebar expand/collapse control visible when the sidebar is closed */
+        [data-testid="collapsedControl"] {
+            display: flex !important;
+            position: fixed !important;
+            top: 0.9rem !important;
+            left: 0.9rem !important;
+            z-index: 1000 !important;
+        }
+
+        [data-testid="collapsedControl"] button {
+            background-color: #ffffff !important;
+            border: 1px solid #c6c6cd !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12) !important;
+            color: #0b1c30 !important;
         }
         
         [data-testid="stSidebar"] * {
@@ -458,7 +476,7 @@ st.markdown(
             background-color: rgba(248, 249, 255, 0.8) !important;
             backdrop-filter: blur(8px);
             border-bottom: 1px solid #c6c6cd !important;
-            z-index: 99;
+            z-index: 950;
         }
 
         /* Premium Cards - reduced padding/margin for 1d */

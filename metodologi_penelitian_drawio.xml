@@ -1,0 +1,124 @@
+<?xml version="1.0" ?>
+<mxfile host="Electron" modified="2026-07-10T12:00:00.000Z" agent="5.0" version="22.1.21" type="device">
+  <diagram id="diagram_3" name="Metodologi Penelitian">
+    <mxGraphModel dx="1000" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="n_start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#222222;strokeColor=#000000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="207" y="40" width="26" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_identifikasi" value="Identifikasi Masalah" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="130" y="106" width="180" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_literatur" value="Studi Literatur" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="130" y="186" width="180" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_merge" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="205" y="266" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_understand" value="Understand Context of Use" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="336" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_understand_note" value="Observasi untuk mengetahui&lt;br/&gt;karakteristik pengguna" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.2;fontColor=#333333;fontSize=11;align=left;spacingLeft=8;size=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="334" width="210" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_specify" value="Specify User Requirements" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="416" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_specify_note" value="Wawancara (Kualitatif)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.2;fontColor=#333333;fontSize=11;align=left;spacingLeft=8;size=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="419" width="210" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_design" value="Design Solution" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="496" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_design_note" value="Wireframe, Mockup,&lt;br/&gt;Prototype" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.2;fontColor=#333333;fontSize=11;align=left;spacingLeft=8;size=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="494" width="210" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_evaluasi" value="Evaluasi Desain" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="576" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_evaluasi_note" value="Pengujian ke pengguna" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.2;fontColor=#333333;fontSize=11;align=left;spacingLeft=8;size=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="579" width="210" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_decision" value="Desain belum memenuhi&lt;br/&gt;kebutuhan user?" style="shape=hexagon;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="110" y="656" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_sus" value="Pengolahan Data SUS" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="746" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_sus_note" value="(Kuantitatif)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.2;fontColor=#333333;fontSize=11;align=left;spacingLeft=8;size=12;" vertex="1" parent="1">
+          <mxGeometry x="350" y="749" width="120" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_usability" value="Analisis Hasil Usability" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="826" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_kesimpulan" value="Kesimpulan dan Rekomendasi" style="rounded=1;whiteSpace=wrap;html=1;arcSize=30;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1.5;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="110" y="906" width="220" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_end" value="" style="ellipse;html=1;shape=mxgraph.sysml.end;fillColor=#000000;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="207" y="986" width="26" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_start" target="n_identifikasi">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_identifikasi" target="n_literatur">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_literatur" target="n_merge">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_merge" target="n_understand">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_understand" target="n_specify">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_specify" target="n_design">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_design" target="n_evaluasi">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_evaluasi" target="n_decision">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_decision" target="n_sus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_sus" target="n_usability">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_usability" target="n_kesimpulan">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_kesimpulan" target="n_end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_loop" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.2;endArrow=block;endFill=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="n_decision" target="n_merge">
+          <mxGeometry relative="1" as="geometry">
+            <mxArray as="points">
+              <mxPoint x="580" y="681"/>
+              <mxPoint x="580" y="281"/>
+            </mxArray>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nlink_200" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#999999;strokeWidth=1;" edge="1" parent="1" source="n_understand" target="n_understand_note">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="nlink_201" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#999999;strokeWidth=1;" edge="1" parent="1" source="n_specify" target="n_specify_note">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="nlink_202" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#999999;strokeWidth=1;" edge="1" parent="1" source="n_design" target="n_design_note">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="nlink_203" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#999999;strokeWidth=1;" edge="1" parent="1" source="n_evaluasi" target="n_evaluasi_note">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="nlink_204" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#999999;strokeWidth=1;" edge="1" parent="1" source="n_sus" target="n_sus_note">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
