@@ -190,7 +190,7 @@ if "logged_in" not in st.session_state:
 if "user_role" not in st.session_state:
     st.session_state["user_role"] = "Admin"
 if "user_name" not in st.session_state:
-    st.session_state["user_name"] = "Jane Doe"
+    st.session_state["user_name"] = "Pengelola Gedung"
 
 # Initialize system parameters configuration (using persistent prefix to survive page unmounting)
 if "persistent_tarif_pln" not in st.session_state:
@@ -369,13 +369,13 @@ if not st.session_state["logged_in"]:
                 if role == "Admin" and username == "admin" and password == "admin":
                     st.session_state["logged_in"] = True
                     st.session_state["user_role"] = "Admin"
-                    st.session_state["user_name"] = "Jane Doe"
+                    st.session_state["user_name"] = "Pengelola Gedung"
                     st.success("Login berhasil!")
                     st.rerun()
                 elif role == "Super Admin" and username == "superadmin" and password == "superadmin":
                     st.session_state["logged_in"] = True
                     st.session_state["user_role"] = "Super Admin"
-                    st.session_state["user_name"] = "John Doe"
+                    st.session_state["user_name"] = "Manajemen Gedung"
                     st.success("Login berhasil!")
                     st.rerun()
                 else:
@@ -720,17 +720,28 @@ with st.sidebar:
         unsafe_allow_html=True
     )
     
-    # Selection radio formatted nicely
-    page = st.radio(
-        "Navigation",
-        options=[
+    # Role-based navigation: Admin (Pengelola Gedung) only gets monitoring pages
+    current_role = st.session_state.get("user_role", "Admin")
+    if current_role == "Super Admin":
+        nav_options = [
             "Dashboard",
             "Analisa Energi",
             "Profile Gedung",
             "Forecasting",
             "Reports & Audit",
             "Admin Settings"
-        ],
+        ]
+    else:
+        # Admin (Pengelola Gedung) - monitoring only, no management features
+        nav_options = [
+            "Dashboard",
+            "Analisa Energi",
+            "Profile Gedung"
+        ]
+
+    page = st.radio(
+        "Navigation",
+        options=nav_options,
         label_visibility="collapsed"
     )
 
@@ -759,20 +770,35 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    # Footer/Profile in Sidebar
+    # Footer/Profile in Sidebar with role badge
     u_name = st.session_state.get("user_name", "Jane Doe")
     u_role = st.session_state.get("user_role", "Admin")
     u_initials = "".join([part[0] for part in u_name.split()[:2]]).upper()
 
+    # Role badge styling
+    if u_role == "Super Admin":
+        role_label = "Manajemen Gedung"
+        role_badge_bg = "rgba(0, 150, 104, 0.15)"
+        role_badge_color = "#4edea3"
+        role_badge_border = "rgba(78, 222, 163, 0.3)"
+        avatar_bg = "#0058be"
+    else:
+        role_label = "Pengelola Gedung"
+        role_badge_bg = "rgba(59, 130, 246, 0.15)"
+        role_badge_color = "#adc6ff"
+        role_badge_border = "rgba(173, 198, 255, 0.3)"
+        avatar_bg = "#2170e4"
+
     st.markdown(
         f"""
         <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px;">
-            <div style="width: 36px; height: 36px; border-radius: 9999px; background-color: #2170e4; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">
+            <div style="width: 36px; height: 36px; border-radius: 9999px; background-color: {avatar_bg}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">
                 {u_initials}
             </div>
             <div>
                 <p style="font-size: 13px; font-weight: 600; color: #ffffff; margin: 0; line-height: 1.2;">{u_name}</p>
-                <p style="font-size: 10px; color: rgba(255,255,255,0.6); margin: 0;">{u_role}</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.6); margin: 2px 0 4px 0;">{u_role}</p>
+                <span style="font-size: 9px; font-weight: 600; color: {role_badge_color}; background: {role_badge_bg}; border: 1px solid {role_badge_border}; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">{role_label}</span>
             </div>
         </div>
         """,
@@ -783,7 +809,7 @@ with st.sidebar:
     if st.button("Keluar (Logout)", use_container_width=True):
         st.session_state["logged_in"] = False
         st.session_state["user_role"] = "Admin"
-        st.session_state["user_name"] = "Jane Doe"
+        st.session_state["user_name"] = "Pengelola Gedung"
         st.rerun()
 
 # Header Section Builder
@@ -791,7 +817,7 @@ def build_header(title, subtitle_badge=None, temp_str="31°C", user_role=None, u
     if user_role is None:
         user_role = st.session_state.get("user_role", "Admin")
     if user_name is None:
-        user_name = st.session_state.get("user_name", "Jane Doe")
+        user_name = st.session_state.get("user_name", "Pengelola Gedung")
     badge_html = f'<div style="height: 20px; width: 1px; bg-color: #c6c6cd; background-color: #c6c6cd; margin: 0 12px;"></div><span style="font-size: 11px; font-weight: 600; color: #45464d; background-color: #e5eeff; padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">{subtitle_badge}</span>' if subtitle_badge else ''
     
     st.markdown(

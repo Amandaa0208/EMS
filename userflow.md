@@ -1,43 +1,52 @@
-# Dokumentasi User Flow - EMS Enterprise
+# Dokumentasi User Flow — EMS Enterprise (Per Role)
 
-Dokumen ini menjelaskan alur perjalanan pengguna (User Flow) saat menggunakan sistem **EMS Enterprise (Sistem Pemantauan Energi Gedung)**. Alur ini memandu bagaimana pengguna berinteraksi dengan antarmuka Streamlit, mengalirkan data, dan mengoperasikan fitur-fitur analisis dari halaman awal hingga pengaturan administrasi.
+Dokumen ini menjelaskan alur perjalanan pengguna (User Flow) saat menggunakan sistem **EMS Enterprise (Sistem Pemantauan Energi Gedung)**. Alur ini dibagi berdasarkan **dua role** yang memiliki hak akses berbeda.
 
 ---
 
-## 1. Peta Navigasi Global (Global User Flow)
+## 1. Definisi Role & Hak Akses
 
-Berikut adalah bagan alir navigasi utama yang menggambarkan pintu masuk pengguna ke dalam aplikasi dan opsi menu yang tersedia setelah berhasil login.
+| Role | Jabatan | Hak Akses Sidebar |
+| :--- | :--- | :--- |
+| **Super Admin** | Manajemen Gedung | Dashboard, Analisa Energi, Profile Gedung, **Forecasting**, **Reports & Audit**, **Admin Settings** |
+| **Admin** | Pengelola Gedung | Dashboard, Analisa Energi, Profile Gedung |
+
+> **Catatan:** Admin (Pengelola Gedung) tidak melihat menu Forecasting, Reports & Audit, dan Admin Settings di sidebar. Pembatasan ini bersifat *structural* — menu tidak ditampilkan, bukan hanya di-disable.
+
+---
+
+## 2. Peta Navigasi Global (Per Role)
+
+### 2A. Super Admin — Manajemen Gedung (Akses Penuh)
 
 ```mermaid
 graph TD
-    %% Styling
     classDef startStyle fill:#0058be,stroke:#001a42,stroke-width:2px,color:#ffffff,font-weight:bold;
     classDef stepStyle fill:#ffffff,stroke:#0058be,stroke-width:1.5px,color:#0b1c30;
     classDef checkStyle fill:#ff9f1c,stroke:#b36b00,stroke-width:2px,color:#ffffff,font-weight:bold;
     classDef endStyle fill:#ba1a1a,stroke:#410002,stroke-width:2px,color:#ffffff,font-weight:bold;
-    
+    classDef superStyle fill:#d8e2ff,stroke:#001a42,stroke-width:2px,color:#001a42,font-weight:bold;
+
     StartNode(["Mulai: Buka Aplikasi"]):::startStyle
-    LoginForm["Form Login: Input Kredensial & Role"]:::stepStyle
+    LoginForm["Form Login: Super Admin"]:::stepStyle
     AuthCheck{"Validasi Sukses?"}:::checkStyle
     ShowError["Tampilkan Pesan Error"]:::stepStyle
-    
-    %% Alur Operasional Linear (Top-to-Bottom)
-    LoadDashboard["Dashboard: Memantau Kondisi Energi & Status Baseline"]:::stepStyle
-    GoToAnalisa["Analisa Energi: Membandingkan Konsumsi & Unduh CSV"]:::stepStyle
-    GoToProfile["Profile Gedung: Monitoring Live Telemetri 3-Phase"]:::stepStyle
-    GoToForecast["Forecasting: Memicu Prediksi Beban Listrik (ML)"]:::stepStyle
-    GoToReports["Reports & Audit: Mengunduh Laporan Kepatuhan"]:::stepStyle
-    GoToSettings["Admin Settings: Update Tarif PLN & Kelola Gedung"]:::stepStyle
-    
+
+    LoadDashboard["1. Dashboard: Memantau Kondisi Energi & Status Baseline"]:::stepStyle
+    GoToAnalisa["2. Analisa Energi: Membandingkan Konsumsi & Unduh CSV"]:::stepStyle
+    GoToProfile["3. Profile Gedung: Monitoring Live Telemetri 3-Phase"]:::stepStyle
+    GoToForecast["4. Forecasting: Prediksi Beban Listrik via AI/ML"]:::superStyle
+    GoToReports["5. Reports & Audit: Mengunduh Laporan Kepatuhan"]:::superStyle
+    GoToSettings["6. Admin Settings: Update Tarif PLN & Kelola Gedung"]:::superStyle
+
     Logout["Klik Logout & Hapus Sesi"]:::stepStyle
     EndNode(["Selesai: Sesi Berakhir"]):::endStyle
 
-    %% Hubungan Aliran
     StartNode --> LoginForm
     LoginForm --> AuthCheck
     AuthCheck -- Tidak --> ShowError
     ShowError --> LoginForm
-    
+
     AuthCheck -- Ya --> LoadDashboard
     LoadDashboard --> GoToAnalisa
     GoToAnalisa --> GoToProfile
@@ -48,33 +57,82 @@ graph TD
     Logout --> EndNode
 ```
 
+### 2B. Admin — Pengelola Gedung (Akses Terbatas)
+
+```mermaid
+graph TD
+    classDef startStyle fill:#0058be,stroke:#001a42,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef stepStyle fill:#ffffff,stroke:#0058be,stroke-width:1.5px,color:#0b1c30;
+    classDef checkStyle fill:#ff9f1c,stroke:#b36b00,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef endStyle fill:#ba1a1a,stroke:#410002,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef blockedStyle fill:#fee2e2,stroke:#ba1a1a,stroke-width:2px,stroke-dasharray: 5 5,color:#ba1a1a;
+
+    StartNode(["Mulai: Buka Aplikasi"]):::startStyle
+    LoginForm["Form Login: Admin"]:::stepStyle
+    AuthCheck{"Validasi Sukses?"}:::checkStyle
+    ShowError["Tampilkan Pesan Error"]:::stepStyle
+
+    LoadDashboard["1. Dashboard: Memantau Kondisi Energi & Status Baseline"]:::stepStyle
+    GoToAnalisa["2. Analisa Energi: Membandingkan Konsumsi & Unduh CSV"]:::stepStyle
+    GoToProfile["3. Profile Gedung: Monitoring Live Telemetri 3-Phase"]:::stepStyle
+
+    BlockedForecast["❌ Forecasting — Tidak Tersedia"]:::blockedStyle
+    BlockedReports["❌ Reports & Audit — Tidak Tersedia"]:::blockedStyle
+    BlockedSettings["❌ Admin Settings — Tidak Tersedia"]:::blockedStyle
+
+    Logout["Klik Logout & Hapus Sesi"]:::stepStyle
+    EndNode(["Selesai: Sesi Berakhir"]):::endStyle
+
+    StartNode --> LoginForm
+    LoginForm --> AuthCheck
+    AuthCheck -- Tidak --> ShowError
+    ShowError --> LoginForm
+
+    AuthCheck -- Ya --> LoadDashboard
+    LoadDashboard --> GoToAnalisa
+    GoToAnalisa --> GoToProfile
+    GoToProfile --> Logout
+    Logout --> EndNode
+
+    GoToProfile -.->|Akses Ditolak| BlockedForecast
+    GoToProfile -.->|Akses Ditolak| BlockedReports
+    GoToProfile -.->|Akses Ditolak| BlockedSettings
+```
+
 ---
 
-## 2. Alur Detail Per Fitur (Detail Flows)
+## 3. Alur Detail Per Fitur
 
-Berikut adalah rincian langkah demi langkah dari setiap fungsi utama aplikasi:
+### A. Alur Otentikasi & Login (Kedua Role)
 
-### A. Alur Otentikasi & Login (Authentication Flow)
-Alur ini menjamin bahwa hanya pengguna terdaftar (*Admin* dengan username `admin` atau *Super Admin* dengan username `superadmin`) yang dapat masuk ke panel dashboard.
+Alur ini menjamin bahwa hanya pengguna terdaftar (*Admin* dengan username `admin` atau *Super Admin* dengan username `superadmin`) yang dapat masuk ke panel dashboard. Setelah login, sidebar menampilkan menu sesuai role.
 
 ```mermaid
 graph TD
     classDef step fill:#ffffff,stroke:#0058be,stroke-width:1.5px,color:#0b1c30;
     classDef check fill:#ff9f1c,stroke:#b36b00,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef roleAdmin fill:#eff4ff,stroke:#3b82f6,stroke-width:2px,color:#0b1c30;
+    classDef roleSuperAdmin fill:#d8e2ff,stroke:#001a42,stroke-width:2px,color:#001a42;
 
-    A[Input Username & Password]:::step --> B[Pilih Role Akses: Admin / Super Admin]:::step
-    B --> C[Klik 'Masuk ke Dashboard']:::step
+    A["Input Username & Password"]:::step --> B["Pilih Role Akses: Admin / Super Admin"]:::step
+    B --> C["Klik 'Masuk ke Dashboard'"]:::step
     C --> D{"Apakah Kredensial Valid?"}:::check
-    D -- Ya --> E[Set st.session_state['logged_in'] = True]:::step
-    E --> F[Inisialisasi Role & Nama Pengguna]:::step
-    F --> G[Rerun halaman ke Dashboard Utama]:::step
-    D -- Tidak --> H[Tampilkan st.error]:::step
-    H --> A
+    D -- Ya --> E["Set session_state logged_in = True"]:::step
+    E --> F{"Role yang Dipilih?"}:::check
+    F -- Admin --> G["Inisialisasi: Pengelola Gedung"]:::roleAdmin
+    G --> G1["Sidebar: Dashboard, Analisa Energi, Profile Gedung"]:::roleAdmin
+    F -- Super Admin --> H["Inisialisasi: Manajemen Gedung"]:::roleSuperAdmin
+    H --> H1["Sidebar: Semua 6 Menu Lengkap"]:::roleSuperAdmin
+    G1 --> I["Rerun ke Dashboard Utama"]:::step
+    H1 --> I
+    D -- Tidak --> J["Tampilkan Pesan Error"]:::step
+    J --> A
 ```
 
 ---
 
-### B. Alur Analisa Profil Energi (Energy Analysis Flow)
+### B. Alur Analisa Profil Energi (Super Admin & Admin)
+
 Pada modul **Analisa Energi**, pengguna dapat menyaring data histori penggunaan energi berdasarkan rentang waktu, kategori beban, dan pembanding.
 
 ```mermaid
@@ -100,7 +158,8 @@ graph TD
 
 ---
 
-### C. Alur Pemantauan Detail Telemetri (Building Profile Flow)
+### C. Alur Pemantauan Detail Telemetri (Super Admin & Admin)
+
 Alur ini berjalan secara real-time. Data diperbarui secara dinamis setiap 2 detik menggunakan fitur `st.fragment` dari Streamlit.
 
 ```mermaid
@@ -125,8 +184,9 @@ graph TD
 
 ---
 
-### D. Alur Forecasting Beban Energi (Machine Learning Flow)
-Di modul **Forecasting**, pengguna melatih model *Random Forest* untuk memproyeksikan konsumsi daya listrik gedung di masa mendatang.
+### D. Alur Forecasting Beban Energi — ⚠️ Khusus Super Admin
+
+Di modul **Forecasting**, pengguna melatih model *Random Forest* untuk memproyeksikan konsumsi daya listrik gedung di masa mendatang. **Fitur ini hanya tersedia untuk Super Admin (Manajemen Gedung).**
 
 ```mermaid
 graph TD
@@ -154,8 +214,33 @@ graph TD
 
 ---
 
-### E. Alur Pengelolaan Parameter & Gedung (Admin Settings Flow)
-Pengaturan administrasi memungkinkan modifikasi parameter tarif, batas baseline, serta struktur kategori dan gedung.
+### E. Alur Reports & Audit — ⚠️ Khusus Super Admin
+
+Modul pelaporan dan audit trail. **Hanya tersedia untuk Super Admin (Manajemen Gedung).**
+
+```mermaid
+graph TD
+    classDef step fill:#ffffff,stroke:#0058be,stroke-width:1.5px,color:#0b1c30;
+    classDef check fill:#ff9f1c,stroke:#b36b00,stroke-width:2px,color:#ffffff,font-weight:bold;
+
+    A[Masuk Halaman 'Reports & Audit']:::step --> B{Pilih Jenis Laporan}:::check
+    B -->|Audit BPK| C[Lihat Laporan Audit Keuangan Energi]:::step
+    B -->|Efisiensi| D[Lihat Laporan Efisiensi Bulanan]:::step
+    B -->|Rekap Gedung| E[Lihat Rekapitulasi Konsumsi per Gedung]:::step
+    B -->|Audit Trail| F[Lihat Log Audit Trail Transaksi Energi]:::step
+    C --> G{Ekspor Laporan?}:::check
+    D --> G
+    E --> G
+    F --> G
+    G -- Ya --> H[Unduh dalam Format CSV]:::step
+    G -- Tidak --> I[Selesai]:::step
+```
+
+---
+
+### F. Alur Pengelolaan Parameter & Gedung — ⚠️ Khusus Super Admin
+
+Pengaturan administrasi memungkinkan modifikasi parameter tarif, batas baseline, serta struktur kategori dan gedung. **Hanya tersedia untuk Super Admin (Manajemen Gedung).**
 
 ```mermaid
 graph TD
@@ -168,30 +253,31 @@ graph TD
     %% Jalur Tarif
     B -->|1. Tarif PLN| C[Masukkan Nilai Tarif per kWh]:::step
     C --> D[Klik 'Simpan Perubahan Tarif PLN']:::step
-    D --> E[Perbarui st.session_state['tarif_pln'] secara global]:::step
+    D --> E[Perbarui st.session_state tarif_pln secara global]:::step
     
     %% Jalur Target Baseline
     B -->|2. Target Baseline| F[Pilih Tipe Rentang & Batas kWh]:::step
     F --> G[Klik 'Simpan Target']:::step
-    G --> H[Perbarui st.session_state['batas_angka']]:::step
+    G --> H[Perbarui st.session_state batas_angka]:::step
+
+    %% Jalur Kategori Beban
+    B -->|3. Kategori Beban| I1[Lihat/Tambah/Hapus Kategori Beban]:::step
     
     %% Jalur Gedung Baru
-    B -->|3. Tambah Gedung| I[Input Nama Gedung & Nomor Port Modbus]:::step
+    B -->|4. Tambah Gedung| I[Input Nama Gedung & Nomor Port Modbus]:::step
     I --> J[Klik 'Tambah Gedung']:::step
     J --> K[Hubungkan ke ems.db]:::db
     K --> L[Jalankan CREATE TABLE device_port_XXX_readings]:::db
     L --> M[Masukkan baris telemetri inisiasi pertama]:::db
-    M --> N[Tambahkan ke st.session_state['gedung_list']]:::step
+    M --> N[Tambahkan ke st.session_state gedung_list]:::step
     N --> O[Picu st.rerun untuk memuat gedung baru]:::step
 ```
 
 ---
 
-## 3. Kode Script PlantUML untuk User Flow (StarUML / PlantText)
+## 4. Kode Script PlantUML (Untuk StarUML / PlantText)
 
-Berikut adalah kode script PlantUML (Activity Diagram) yang dapat Anda gunakan di **StarUML**, **PlantText**, atau editor PlantUML lainnya untuk me-render User Flow secara otomatis dengan garis yang lurus dan rapi:
-
-### A. Global User Flow (Alur Navigasi Utama)
+### A. User Flow Super Admin (Manajemen Gedung)
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -199,26 +285,66 @@ skinparam ActivityBackgroundColor White
 skinparam ActivityBorderColor #0058be
 skinparam ArrowColor #0b1c30
 
+title User Flow — Super Admin (Manajemen Gedung)
+
 start
 :Buka Aplikasi;
-:Form Login: Input Kredensial & Role;
+:Form Login: Input **superadmin** / **superadmin**;
+:Pilih Role: **Super Admin**;
 if (Validasi Sukses?) then (tidak)
   :Tampilkan Pesan Error;
   detach
 else (ya)
-  :Dashboard: Memantau Kondisi Energi & Status Baseline;
-  :Analisa Energi: Membandingkan Konsumsi & Unduh CSV;
-  :Profile Gedung: Monitoring Live Telemetri 3-Phase;
-  :Forecasting: Memicu Prediksi Beban Listrik (ML);
-  :Reports & Audit: Mengunduh Laporan Kepatuhan;
-  :Admin Settings: Update Tarif PLN & Kelola Gedung;
+  :Inisialisasi Sesi: **Manajemen Gedung**;
+  :Sidebar menampilkan **6 menu lengkap**;
+  :1. Dashboard: Memantau Kondisi Energi & Status Baseline;
+  :2. Analisa Energi: Membandingkan Konsumsi & Unduh CSV;
+  :3. Profile Gedung: Monitoring Live Telemetri 3-Phase;
+  #LightBlue:4. Forecasting: Prediksi Beban Listrik via AI/ML;
+  #LightBlue:5. Reports & Audit: Mengunduh Laporan Kepatuhan;
+  #LightBlue:6. Admin Settings: Update Tarif PLN & Kelola Gedung;
   :Klik Logout & Hapus Sesi;
   stop
 endif
 @enduml
 ```
 
-### B. Alur Detail Login
+### B. User Flow Admin (Pengelola Gedung)
+```plantuml
+@startuml
+skinparam roundcorner 10
+skinparam ActivityBackgroundColor White
+skinparam ActivityBorderColor #0058be
+skinparam ArrowColor #0b1c30
+
+title User Flow — Admin (Pengelola Gedung)
+
+start
+:Buka Aplikasi;
+:Form Login: Input **admin** / **admin**;
+:Pilih Role: **Admin**;
+if (Validasi Sukses?) then (tidak)
+  :Tampilkan Pesan Error;
+  detach
+else (ya)
+  :Inisialisasi Sesi: **Pengelola Gedung**;
+  :Sidebar menampilkan **3 menu monitoring**;
+  :1. Dashboard: Memantau Kondisi Energi & Status Baseline;
+  :2. Analisa Energi: Membandingkan Konsumsi & Unduh CSV;
+  :3. Profile Gedung: Monitoring Live Telemetri 3-Phase;
+  note right
+    Menu berikut **tidak tersedia**:
+    ❌ Forecasting
+    ❌ Reports & Audit
+    ❌ Admin Settings
+  end note
+  :Klik Logout & Hapus Sesi;
+  stop
+endif
+@enduml
+```
+
+### C. Alur Detail Login (Kedua Role)
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -235,14 +361,20 @@ if (Kredensial Valid?) then (tidak)
   stop
 else (ya)
   :Set session_state['logged_in'] = True;
-  :Inisialisasi Role & Nama Pengguna;
+  if (Role?) then (Admin)
+    :Inisialisasi: **Pengelola Gedung**;
+    :Sidebar: 3 Menu Monitoring;
+  else (Super Admin)
+    :Inisialisasi: **Manajemen Gedung**;
+    :Sidebar: 6 Menu Lengkap;
+  endif
   :Rerun ke Dashboard Utama;
   stop
 endif
 @enduml
 ```
 
-### C. Alur Detail Analisa Energi
+### D. Alur Detail Analisa Energi
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -273,7 +405,7 @@ stop
 @enduml
 ```
 
-### D. Alur Detail Profile Gedung
+### E. Alur Detail Profile Gedung
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -297,7 +429,7 @@ stop
 @enduml
 ```
 
-### E. Alur Detail Forecasting
+### F. Alur Detail Forecasting (Super Admin Only)
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -307,6 +439,7 @@ skinparam ArrowColor #0b1c30
 
 start
 :Masuk Halaman 'Forecasting';
+note right: Hanya Super Admin
 :Pilih Gedung & Horizon (24 Jam / 7 Hari);
 :Muat Histori Data dari SQLite;
 :Latih Random Forest Regressor;
@@ -321,7 +454,7 @@ stop
 @enduml
 ```
 
-### F. Alur Detail Admin Settings
+### G. Alur Detail Admin Settings (Super Admin Only)
 ```plantuml
 @startuml
 skinparam roundcorner 10
@@ -331,6 +464,7 @@ skinparam ArrowColor #0b1c30
 
 start
 :Masuk Halaman 'Admin Settings';
+note right: Hanya Super Admin
 split
   :1. Tarif PLN;
   :Masukkan Nilai Tarif per kWh;
@@ -342,7 +476,10 @@ split currents
   :Klik 'Simpan Target';
   :Update batas_angka Global;
 split currents
-  :3. Tambah Gedung;
+  :3. Kategori Beban;
+  :Lihat/Tambah/Hapus Kategori;
+split currents
+  :4. Manajemen Gedung;
   :Input Nama & Port Modbus;
   :Klik 'Tambah Gedung';
   :CREATE TABLE device_port_XXX_readings;
@@ -353,4 +490,5 @@ end split
 stop
 @enduml
 ```
+
 
